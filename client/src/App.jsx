@@ -3,19 +3,51 @@ import axios from 'axios';
 import './App.css';
 
 function WeatherCard({ data }) {
+  const date = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+
   return (
     <div className="weather-card">
-      <h2>{data.city}</h2>
-      <img
-        src={`https://openweathermap.org/img/wn/${data.icon}@2x.png`}
-        alt={data.description}
-      />
-      <p className="temp">{Math.round(data.temperature)}°C</p>
-      <p className="description">{data.description}</p>
-      <div className="details">
-        <span>Feels like: {Math.round(data.feels_like)}°C</span>
-        <span>Humidity: {data.humidity}%</span>
-        <span>Wind: {data.wind_speed} m/s</span>
+      <div className="weather-header">
+        <div>
+          <p className="location-label">Current Weather</p>
+          <h2 className="city-name">{data.city}</h2>
+          <p className="date">{date}</p>
+        </div>
+      </div>
+
+      <div className="weather-main">
+        <div className="temp-section">
+          <p className="temperature">{Math.round(data.temperature)}°</p>
+          <p className="description">{data.description}</p>
+          <p className="feels-like">Feels like {Math.round(data.feels_like)}°C</p>
+        </div>
+        <div className="icon-section">
+          <div className="icon-circle">
+            <img
+              src={`https://openweathermap.org/img/wn/${data.icon}@2x.png`}
+              alt={data.description}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="stats-grid">
+        <div className="stat-card">
+          <p className="stat-label">Humidity</p>
+          <p className="stat-value">{data.humidity}%</p>
+        </div>
+        <div className="stat-card">
+          <p className="stat-label">Wind</p>
+          <p className="stat-value">{data.wind_speed} m/s</p>
+        </div>
+        <div className="stat-card">
+          <p className="stat-label">Feels like</p>
+          <p className="stat-value">{Math.round(data.feels_like)}°C</p>
+        </div>
       </div>
     </div>
   );
@@ -49,18 +81,21 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Weather Dashboard</h1>
+      <div className="app-header">
+        <p className="app-title">Weather Dashboard</p>
+      </div>
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Enter a city..."
+          placeholder="Search a city..."
           value={city}
           onChange={(e) => setCity(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button onClick={handleSearch}>Search</button>
+        <button onClick={handleSearch} disabled={loading}>
+          {loading ? '...' : 'Search'}
+        </button>
       </div>
-      {loading && <p>Loading...</p>}
       {error && <p className="error">{error}</p>}
       {weather && <WeatherCard data={weather} />}
     </div>
