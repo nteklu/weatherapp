@@ -66,7 +66,8 @@ function App() {
     setWeather(null);
 
     try {
-      const res = await axios.get(`/api/weather?city=${city}`);
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const res = await axios.get(`${apiUrl}/api/weather?city=${city}`);
       setWeather(res.data);
     } catch (err) {
       setError(err.response?.data?.error || 'Something went wrong');
