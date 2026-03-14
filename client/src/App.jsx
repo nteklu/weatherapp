@@ -17,24 +17,16 @@ function WeatherCard({ data }) {
           <h2 className="city-name">{data.city}</h2>
           <p className="date">{date}</p>
         </div>
-      </div>
-
-      <div className="weather-main">
-        <div className="temp-section">
-          <p className="temperature">{Math.round(data.temperature)}°</p>
-          <p className="description">{data.description}</p>
-          <p className="feels-like">Feels like {Math.round(data.feels_like)}°C</p>
-        </div>
-        <div className="icon-section">
-          <div className="icon-circle">
-            <img
-              src={`https://openweathermap.org/img/wn/${data.icon}@2x.png`}
-              alt={data.description}
-            />
-          </div>
+        <div className="icon-circle">
+          <img
+            src={`https://openweathermap.org/img/wn/${data.icon}@2x.png`}
+            alt={data.description}
+          />
         </div>
       </div>
-
+      <p className="temperature">{Math.round(data.temperature)}°</p>
+      <p className="description">{data.description}</p>
+      <p className="feels-like">Feels like {Math.round(data.feels_like)}°C</p>
       <div className="stats-grid">
         <div className="stat-card">
           <p className="stat-label">Humidity</p>
@@ -45,8 +37,12 @@ function WeatherCard({ data }) {
           <p className="stat-value">{data.wind_speed} m/s</p>
         </div>
         <div className="stat-card">
-          <p className="stat-label">Feels like</p>
-          <p className="stat-value">{Math.round(data.feels_like)}°C</p>
+          <p className="stat-label">UV Index</p>
+          <p className="stat-value">--</p>
+        </div>
+        <div className="stat-card">
+          <p className="stat-label">AQI</p>
+          <p className="stat-value">--</p>
         </div>
       </div>
     </div>
@@ -81,26 +77,36 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <div className="app-header">
-        <p className="app-title">Weather Dashboard</p>
+  <div className="app">
+    <div className="app-header">
+      <p className="app-title">Weather Dashboard</p>
+      <div className="temp-toggle">
+        <button className="active">°C</button>
+        <button>°F</button>
       </div>
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search a city..."
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <button onClick={handleSearch} disabled={loading}>
-          {loading ? '...' : 'Search'}
-        </button>
-      </div>
-      {error && <p className="error">{error}</p>}
-      {weather && <WeatherCard data={weather} />}
     </div>
-  );
+    <div className="search-bar">
+      <input
+        type="text"
+        placeholder="Search a city..."
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+      <button onClick={handleSearch} disabled={loading}>
+        {loading ? '...' : 'Search'}
+      </button>
+    </div>
+    {error && <p className="error">{error}</p>}
+    {!weather && !error && (
+      <div className="empty-state">
+        <p>Search for a city to see the weather</p>
+      </div>
+    )}
+    {weather && <WeatherCard data={weather} />}
+  </div>
+);
+
 }
 
 export default App;
