@@ -66,29 +66,31 @@ function App() {
   const [unit, setUnit] = useState('C');
 
   const handleSearch = async () => {
-    if (!city.trim()) return;
-    setLoading(true);
-    setError('');
-    setWeather(null);
-    setForecast(null);
+  if (!city.trim()) return;
+  setLoading(true);
+  setError('');
+  setWeather(null);
+  setForecast(null);
 
-    try {
-      const weatherRes = await axios.get(`/api/weather?city=${city}`);
-      const weatherData = weatherRes.data;
+  const apiUrl = import.meta.env.VITE_API_URL || '';
 
-      const [forecastRes, aqRes] = await Promise.all([
-        axios.get(`/api/forecast?city=${city}`),
-        axios.get(`/api/airquality?lat=${weatherData.lat}&lon=${weatherData.lon}`),
-      ]);
+  try {
+    const weatherRes = await axios.get(`${apiUrl}/api/weather?city=${city}`);
+    const weatherData = weatherRes.data;
 
-      setWeather({ ...weatherData, airQuality: aqRes.data });
-      setForecast(forecastRes.data);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Something went wrong');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const [forecastRes, aqRes] = await Promise.all([
+      axios.get(`${apiUrl}/api/forecast?city=${city}`),
+      axios.get(`${apiUrl}/api/airquality?lat=${weatherData.lat}&lon=${weatherData.lon}`),
+    ]);
+
+    setWeather({ ...weatherData, airQuality: aqRes.data });
+    setForecast(forecastRes.data);
+  } catch (err) {
+    setError(err.response?.data?.error || 'Something went wrong');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') handleSearch();
