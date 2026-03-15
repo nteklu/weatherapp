@@ -16,8 +16,9 @@ body {
 
 .app {
   width: 100%;
-  max-width: 540px;
-  padding: 24px;
+  max-width: 100%;
+  min-height: 100vh;
+  padding: 40px 10%;
 }
 
 .app-header {

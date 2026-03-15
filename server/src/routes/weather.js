@@ -11,17 +11,30 @@ router.get('/', async (req, res) => {
 
   try {
     const apiKey = process.env.OPENWEATHER_API_KEY;
-    const url = `https://api.openweathermap.org/data/2.5/weather`;
 
-    const response = await axios.get(url, {
-      params: {
-        q: city,
-        appid: apiKey,
-        units: 'metric',
-      },
-    });
+    const weatherResponse = await axios.get(
+      'https://api.openweathermap.org/data/2.5/weather',
+      {
+        params: {
+          q: city,
+          appid: apiKey,
+          units: 'metric',
+        },
+      }
+    );
 
-    const { name, main, weather, wind } = response.data;
+    const { name, main, weather, wind, sys, coord } = weatherResponse.data;
+
+    const uvResponse = await axios.get(
+      'https://api.openweathermap.org/data/2.5/uvi',
+      {
+        params: {
+          lat: coord.lat,
+          lon: coord.lon,
+          appid: apiKey,
+        },
+      }
+    );
 
     res.json({
       city: name,
@@ -31,6 +44,11 @@ router.get('/', async (req, res) => {
       description: weather[0].description,
       icon: weather[0].icon,
       wind_speed: wind.speed,
+      sunrise: sys.sunrise,
+      sunset: sys.sunset,
+      lat: coord.lat,
+      lon: coord.lon,
+      uv: Math.round(uvResponse.data.value),
     });
 
   } catch (err) {
