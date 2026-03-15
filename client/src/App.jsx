@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 import SunriseSunset from './components/SunriseSunset';
@@ -92,7 +92,53 @@ function App() {
   }
 };
 
-  const handleKeyDown = (e) => {
+const fetchByCoords = async (lat, lon) => {
+  setLoading(true);
+  setError('');
+  setWeather(null);
+  setForecast(null);
+
+  const apiUrl = import.meta.env.VITE_API_URL || '';
+
+  try {
+    const weatherRes = await axios.get(
+      `${apiUrl}/api/weatherbycoords?lat=${lat}&lon=${lon}`
+    );
+    const weatherData = weatherRes.data;
+
+    const [forecastRes, aqRes] = await Promise.all([
+      axios.get(`${apiUrl}/api/forecast?city=${weatherData.city}`),
+      axios.get(
+        `${apiUrl}/api/airquality?lat=${weatherData.lat}&lon=${weatherData.lon}`
+      ),
+    ]);
+
+    setWeather({ ...weatherData, airQuality: aqRes.data });
+    setForecast(forecastRes.data);
+  } catch (err) {
+    setError('Could not fetch weather for your location');
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        fetchByCoords(
+          position.coords.latitude,
+          position.coords.longitude
+        );
+      },
+      () => {
+        // User denied location or it failed — do nothing, let them search manually
+      }
+    );
+  }
+}, []);
+
+const handleKeyDown = (e) => {
     if (e.key === 'Enter') handleSearch();
   };
 
@@ -133,7 +179,7 @@ function App() {
 
       {!weather && !error && (
         <div className="empty-state">
-          <p>Search for a city to see the weather</p>
+          <p>{loading ? 'Detecting your location...' : 'Search for a city to see the weather'}</p>
         </div>
       )}
 
